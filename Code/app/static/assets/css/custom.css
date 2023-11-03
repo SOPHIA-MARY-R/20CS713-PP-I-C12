@@ -1,4 +1,4 @@
-body {
+#home-body {
     background-image: url('../img/college.jpg');
     background-repeat: no-repeat;
     background-size: cover;
@@ -11,6 +11,11 @@ body {
     justify-content: center;
 }
 
+.auth-body{
+    background-image: url('../img/gradient-blue.svg');
+    overflow: hidden;
+}
+
 .button {
     display: inline-block;
     border-radius: 4px;
@@ -19,7 +24,7 @@ body {
     color: #FFFFFF;
     text-align: center;
     font-size: 24px;
-    padding: 20px;
+    padding: 12px 10px;
     width: 180px;
     transition: all 0.5s;
     cursor: pointer;
