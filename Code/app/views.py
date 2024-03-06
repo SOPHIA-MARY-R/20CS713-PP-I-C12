@@ -178,6 +178,16 @@ def recommendations():
     filtered_data = dataset[(dataset[community_column] >= float(cutoff)) &
                            (dataset['Branch_Name'] == 'Civil Engineering')]
 
+ # Drop duplicate rows based on College_Name
+    filtered_data.drop_duplicates(subset=['College_Name'], keep='first', inplace=True)
+
+    # Select only the specified columns
+    selected_columns = ['College_Code', 'College_Name', 'Branch_Code', 'Branch_Name', community_column]
+    filtered_data = filtered_data[selected_columns]
+
+    # Convert filtered data to HTML table
+    table_html = filtered_data.to_html(index=False, classes='table table-striped')
+    
     # Convert filtered data to HTML table
     table_html = filtered_data.to_html()
 
