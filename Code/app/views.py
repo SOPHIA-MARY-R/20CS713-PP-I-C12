@@ -196,8 +196,5 @@ def recommendations():
 
     # Convert filtered data to HTML table
     table_html = filtered_data.to_html(index=False, classes='table table-striped')
-    
-    # Convert filtered data to HTML table
-    table_html = filtered_data.to_html()
 
     return render_template('recommendations.html', table=table_html)

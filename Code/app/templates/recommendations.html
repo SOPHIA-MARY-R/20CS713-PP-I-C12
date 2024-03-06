@@ -1,17 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Recommendations</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="icon" href="../static/assets/img/graduation-cap.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+    <script src="https://kit.fontawesome.com/9b45bbf03c.js" crossorigin="anonymous"></script>
+    <style>
+        .center-outer {
+            margin-top: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .table-container {
+            max-height: 400px; /* Adjust the height as needed */
+            overflow-y: auto;
+        }
+    </style>
 </head>
-<body>
-    <h1>Recommendations</h1>
-    {% if table %}
-        {{ table|safe }}
-    {% else %}
-        <p>No recommendations found.</p>
-    {% endif %}
-    <br>
-    <a href="/details">Go back to search</a>
+
+<body class="auth-body">
+    {% include 'navigation.html' %}
+    <main>
+        <div class="center-outer">
+            <div class="container bg-white">
+                <div class="row justify-content-center p-4">
+            <h3 style="text-align: center;">Recommendations</h3>
+            {% if table %}
+            <div class="table-container"></div>
+            <table class="table table-striped">
+                <tbody>
+                    {{ table|safe }}
+                </tbody>
+            </table>
+            </div>
+            {% else %}
+            <p>No recommendations found.</p>
+            {% endif %}
+            <br />
+
+            <a href="/details">Go back to search</a>
+        </div>
+    </div>
+</div>
+    </main>
 </body>
+
 </html>
