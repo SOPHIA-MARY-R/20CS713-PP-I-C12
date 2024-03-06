@@ -3,6 +3,8 @@
 
 # Python modules
 import os, logging 
+import pandas as pd
+
 
 # Flask modules
 from flask               import render_template, request, url_for, redirect, send_from_directory
@@ -14,6 +16,8 @@ from jinja2              import TemplateNotFound
 from app        import app, lm, db, bc
 from app.models import Users
 from app.forms  import LoginForm, RegisterForm
+
+dataset = pd.read_excel('dataset.xlsx')
 
 # provide login manager with load_user callback
 @lm.user_loader
@@ -143,3 +147,38 @@ def details():
 @app.route('/sitemap.xml')
 def sitemap():
     return send_from_directory(os.path.join(app.root_path, 'static'), 'sitemap.xml')
+
+@app.route('/recommendations', methods=['POST'])
+def recommendations():
+    # Get user inputs from the form
+    cutoff = request.form['cut-off']
+    branch = request.form['branch']
+    community = request.form['community']
+    location = request.form['location']
+
+    print(cutoff, branch, community, location, sep=" ")
+
+    community_column = ''
+    if community == 'OC':
+        community_column = 'OC'
+    elif community == 'BCM':
+        community_column = 'BCM'
+    elif community == 'BC':
+        community_column = 'BC'
+    elif community == 'MBC':
+        community_column = 'MBC'
+    elif community == 'SCA':
+        community_column = 'SCA'
+    elif community == 'SC':
+        community_column = 'SC'
+    elif community == 'ST':
+        community_column = 'ST'
+
+    # Filter the dataset based on user inputs
+    filtered_data = dataset[(dataset[community_column] >= float(cutoff)) &
+                           (dataset['Branch_Name'] == 'Civil Engineering')]
+
+    # Convert filtered data to HTML table
+    table_html = filtered_data.to_html()
+
+    return render_template('recommendations.html', table=table_html)

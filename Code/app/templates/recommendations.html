@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Recommendations</title>
+</head>
+<body>
+    <h1>Recommendations</h1>
+    {% if table %}
+        {{ table|safe }}
+    {% else %}
+        <p>No recommendations found.</p>
+    {% endif %}
+    <br>
+    <a href="/details">Go back to search</a>
+</body>
+</html>

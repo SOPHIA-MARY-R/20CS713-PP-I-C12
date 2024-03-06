@@ -38,13 +38,13 @@
                 <div class="row justify-content-center p-4">
                     <h3 class="mb-3">Student's Choice</h3>
                     <div class="col-md-6">
-                        <form class="border-dark-subtle">
+                        <form class="border-dark-subtle" action="/recommendations" method="post">
                             <div class="mb-3">
                                 <label for="cut-off" class="form-label fw-semibold">Cut-off Obtained (Out of 200)</label>
-                                <input type="number" class="form-control" id="cut-off">
+                                <input type="number" class="form-control" id="cut-off" name="cut-off">
                             </div>
                             <div class="mb-1 fw-semibold">Community</div>
-                            <select class="form-select mb-3" aria-label="Community">
+                            <select class="form-select mb-3" aria-label="Community" name="community">
                                 <option selected>Select your community</option>
                                 <option value="BC">BC</option>
                                 <option value="MBC">MBC</option>
@@ -52,7 +52,7 @@
                                 <option value="SC">SC/ST</option>
                             </select>
                             <div class="mb-1 fw-semibold">Preferred Branch</div>
-                            <select class="form-select mb-3" aria-label="Community">
+                            <select class="form-select mb-3" aria-label="Community" name="branch">
                                 <option selected>Select your preferred Branch</option>
                                 <option value="CSE">Computer Science and Engineering</option>
                                 <option value="IT">Information Technology</option>
@@ -63,7 +63,7 @@
                             </select>
                             <div class="mb-3">
                                 <label for="location" class="form-label fw-semibold">Enter location</label>
-                                <input type="text" class="form-control" id="location">
+                                <input type="text" class="form-control" id="location" name="location">
                             </div>
                             <button type="submit" class="btn btn-outline-primary w-100">Get Your College list</button>
                         </form>
