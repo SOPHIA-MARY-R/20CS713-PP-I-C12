@@ -101,7 +101,7 @@ def login():
             
             if bc.check_password_hash(user.password, password):
                 login_user(user)
-                return redirect(url_for('details'))
+                return redirect(url_for('calci'))
             else:
                 msg = "Wrong password. Please try again."
         else:
@@ -140,6 +140,15 @@ def details():
     except TemplateNotFound:
         return render_template('page-404.html'), 404
     
+    except:
+        return render_template('page-500.html'), 500
+    
+@app.route('/calci')
+def calci():
+    try:
+        return render_template( 'CutOffCalci.html' )
+    except TemplateNotFound:
+        return render_template('page-404.html'), 404 
     except:
         return render_template('page-500.html'), 500
 
