@@ -17,9 +17,20 @@
             align-items: center;
             justify-content: center;
         }
+
         .table-container {
-            max-height: 400px; /* Adjust the height as needed */
+            overflow-y: scroll;
+        }
+
+        body {
             overflow-y: auto;
+            /* Enable vertical scrolling */
+            overflow-x: hidden;
+            /* Hide horizontal scrollbar */
+            margin: 0;
+            /* Reset default margin */
+            padding: 0;
+            /* Reset default padding */
         }
     </style>
 </head>
@@ -30,24 +41,28 @@
         <div class="center-outer">
             <div class="container bg-white">
                 <div class="row justify-content-center p-4">
-            <h3 style="text-align: center;">Recommendations</h3>
-            {% if table %}
-            <div class="table-container"></div>
-            <table class="table table-striped">
-                <tbody>
-                    {{ table|safe }}
-                </tbody>
-            </table>
-            </div>
-            {% else %}
-            <p>No recommendations found.</p>
-            {% endif %}
-            <br />
+                    <h3 style="text-align: center;">Recommendations</h3>
+                    {% if table %}
+                    <div class="table-container"></div>
+                    <table class="table table-striped">
+                        <tbody>
+                            {{ table|safe }}
+                        </tbody>
+                    </table>
+                    <form action="/export_excel" method="POST">
+                        <input type="hidden" name="html_table" value="{{ table | safe }}">
+                        <button type="submit" class="btn btn-primary">Export to Excel</button>
+                    </form>
+                </div>
+                {% else %}
+                <p>No recommendations found.</p>
+                {% endif %}
+                <br />
 
-            <a href="/details">Go back to search</a>
+                <a href="/details">Go back to search</a>
+            </div>
         </div>
-    </div>
-</div>
+        </div>
     </main>
 </body>
 
