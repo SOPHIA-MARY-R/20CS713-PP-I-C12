@@ -13,7 +13,7 @@
 
 .auth-body{
     background-image: url('../img/gradient-blue.svg');
-    overflow: hidden;
+    overflow: scroll;
 }
 
 .button {

@@ -1,10 +1,12 @@
 # -*- encoding: utf-8 -*-
 # Python modules
+from datetime import datetime
 import os, logging 
+from bs4 import BeautifulSoup
 import pandas as pd
 
 # Flask modules
-from flask               import make_response, render_template, request, url_for, redirect, send_from_directory
+from flask               import make_response, render_template, request, send_file, url_for, redirect, send_from_directory
 from flask_login         import login_user, logout_user, current_user, login_required
 from werkzeug.exceptions import HTTPException, NotFound, abort
 from jinja2              import TemplateNotFound
@@ -152,8 +154,7 @@ def recommendations():
 
     # Filter the dataset based on user inputs
     filtered_data = dataset[(float(cutoff) >= dataset[community_column]) &
-                           (dataset['Branch_Code'] == branch) &
-                           (location.lower() in dataset['College_Name'].str.lower())]
+                           (dataset['Branch_Code'] == branch)]
     
     print(filtered_data)
 
@@ -167,24 +168,47 @@ def recommendations():
     # Convert filtered data to HTML table
     table_html = filtered_data.to_html(index=False, classes='table table-striped')
 
-    return render_template('recommendations.html', table=table_html)
+    return render_template('recommendations.html', table_data=table_html, comm=community_column)
 
 @app.route('/export_excel', methods=['POST'])
 def export_excel():
-    # Get the HTML table data from the POST request
-    html_table = request.form['html_table']
+    try:
+        # Get the HTML table data from the POST request
+        html_table = request.form.get('html_table')
 
-    # Convert HTML table to pandas DataFrame
-    df = pd.read_html(html_table)[0]  # Assuming there's only one table
+        if html_table:
+            # Parse HTML table using BeautifulSoup
+            soup = BeautifulSoup(html_table, 'html.parser')
+            table = soup.find('table')
 
-    # Export DataFrame to Excel
-    excel_data = df.to_excel(index=False)
+            if table:
+                # Convert HTML table to pandas DataFrame
+                df = pd.read_html(str(table))[0]  # Assuming there's only one table
+                
+                timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+                print(datetime.now())
+                print(timestamp)
+                # Define the file path for saving the Excel file
+                file_name = f'table_data_{timestamp}.xlsx'
+                file_path = os.path.join(os.getcwd(), 'app\media', file_name)  # Adjust as needed
 
-    # Create response object
-    response = make_response(excel_data)
+                # Export DataFrame to Excel
+                with pd.ExcelWriter(file_path, engine='xlsxwriter') as writer:
+                    df.to_excel(writer, index=False)
 
-    # Set headers for file download
-    response.headers['Content-Disposition'] = 'attachment; filename=table_data.xlsx'
-    response.headers['Content-Type'] = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                # Create response object
+                response = make_response()
+                
+                # Set headers for file download
+                response.headers['Content-Disposition'] = f'attachment; filename={file_name}'
+                response.headers['Content-Type'] = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 
-    return response
+                # Send the file as a response
+                return send_file(file_path, as_attachment=True, attachment_filename=file_name)
+            else:
+                return "No table found in HTML data"
+        else:
+            return "No HTML table data received"
+    except Exception as e:
+        print("Error:", e)  # Print out any error that occurs for debugging
+        return "Error occurred while exporting to Excel"

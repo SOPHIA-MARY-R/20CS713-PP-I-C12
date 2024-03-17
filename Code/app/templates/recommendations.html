@@ -20,17 +20,39 @@
 
         .table-container {
             overflow-y: scroll;
+            overflow-x: scroll;
+            /* max-height: 300px; Adjust the maximum height as needed */
         }
 
-        body {
-            overflow-y: auto;
-            /* Enable vertical scrolling */
-            overflow-x: hidden;
-            /* Hide horizontal scrollbar */
-            margin: 0;
-            /* Reset default margin */
-            padding: 0;
-            /* Reset default padding */
+        /* width */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        /* Track */
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        /* Handle */
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+        }
+
+        /* Handle on hover */
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        ::-webkit-scrollbar {
+            height: 4px;
+            width: 4px;
+            background: gray;
+        }
+
+        ::-webkit-scrollbar-thumb:horizontal {
+            background: #000;
+            border-radius: 10px;
         }
     </style>
 </head>
@@ -42,15 +64,15 @@
             <div class="container bg-white">
                 <div class="row justify-content-center p-4">
                     <h3 style="text-align: center;">Recommendations</h3>
-                    {% if table %}
+                    {% if table_data %}
                     <div class="table-container"></div>
                     <table class="table table-striped">
                         <tbody>
-                            {{ table|safe }}
+                            {{ table_data | safe }}
                         </tbody>
                     </table>
                     <form action="/export_excel" method="POST">
-                        <input type="hidden" name="html_table" value="{{ table | safe }}">
+                        <input type="hidden" name="html_table" value="{{ table_data }}">
                         <button type="submit" class="btn btn-primary">Export to Excel</button>
                     </form>
                 </div>
@@ -61,7 +83,6 @@
 
                 <a href="/details">Go back to search</a>
             </div>
-        </div>
         </div>
     </main>
 </body>
