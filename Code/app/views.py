@@ -1,18 +1,22 @@
 # -*- encoding: utf-8 -*-
 # Python modules
 from datetime import datetime
-import os, logging 
+import io
+import os
 from bs4 import BeautifulSoup
 import pandas as pd
 
 # Flask modules
 from flask               import make_response, render_template, request, send_file, url_for, redirect, send_from_directory
-from flask_login         import login_user, logout_user, current_user, login_required
-from werkzeug.exceptions import HTTPException, NotFound, abort
+from flask_login         import login_user, logout_user
 from jinja2              import TemplateNotFound
 
+import matplotlib.pyplot as plt
+import io
+import base64
+
 # App modules
-from app        import app, lm, db, bc
+from app        import app, lm, bc
 from app.models import Users
 from app.forms  import LoginForm, RegisterForm
 
@@ -162,7 +166,7 @@ def recommendations():
     filtered_data.drop_duplicates(subset=['College_Name'], keep='first', inplace=True)
 
     # Select only the specified columns
-    selected_columns = ['College_Code', 'College_Name', 'Branch_Code', 'Branch_Name', community_column]
+    selected_columns = ['College_Code', 'College_Name', 'Branch_Code', 'Branch_Name', community_column, 'Placement_Percentage']
     filtered_data = filtered_data[selected_columns]
 
     # Convert filtered data to HTML table
@@ -212,3 +216,29 @@ def export_excel():
     except Exception as e:
         print("Error:", e)  # Print out any error that occurs for debugging
         return "Error occurred while exporting to Excel"
+
+@app.route('/pie_chart', methods=['POST'])
+def pie_chart():
+    # Get HTML table data from POST request
+    html_table = request.form.get('html_table')
+
+    # Convert HTML table to DataFrame
+    table_data = pd.read_html(io.StringIO(html_table))[0]
+
+    # Calculate placement percentages for each college
+    placement_percentages = table_data['Placement_Percentage'].astype(float)
+
+    # Generate pie chart
+    plt.figure(figsize=(8, 8))
+    plt.pie(placement_percentages, labels=table_data['College_Name'], autopct='%1.1f%%', startangle=140)
+    plt.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+    plt.title('Placement Percentage for Colleges')
+    
+    # Convert plot to base64 encoded image
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format='png')
+    buffer.seek(0)
+    img_str = base64.b64encode(buffer.read()).decode()
+    plt.close()
+
+    return render_template('pie_chart.html', img_str=img_str)
