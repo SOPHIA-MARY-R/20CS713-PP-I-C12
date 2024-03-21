@@ -23,6 +23,15 @@
             overflow-x: scroll;
             /* max-height: 300px; Adjust the maximum height as needed */
         }
+
+        .buttons {
+            display: flex;
+            flex-direction: row;
+        }
+
+        form {
+            margin: 5px;
+        }
     </style>
 </head>
 
@@ -40,14 +49,16 @@
                             {{ table_data | safe }}
                         </tbody>
                     </table>
-                    <form action="/export_excel" method="POST">
-                        <input type="hidden" name="html_table" value="{{ table_data }}">
-                        <button type="submit" class="btn btn-primary">Export to Excel</button>
-                    </form>
-                    <form action="/pie_chart" method="POST">
-                        <input type="hidden" name="html_table" value="{{ table_data }}">
-                        <button type="submit" class="btn btn-primary">View Stats</button>
-                    </form>
+                    <div class="buttons">
+                        <form action="/export_excel" method="POST">
+                            <input type="hidden" name="html_table" value="{{ table_data }}">
+                            <button type="submit" class="btn btn-primary">Export to Excel</button>
+                        </form>
+                        <form action="/stats" method="POST">
+                            <input type="hidden" name="html_table" value="{{ table_data }}">
+                            <button type="submit" class="btn btn-primary">View Stats</button>
+                        </form>
+                    </div>
                 </div>
                 {% else %}
                 <p>No recommendations found.</p>

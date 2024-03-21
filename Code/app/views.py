@@ -2,8 +2,10 @@
 # Python modules
 from datetime import datetime
 import io
+import json
 import os
 from bs4 import BeautifulSoup
+from flask_cors import cross_origin
 import pandas as pd
 
 # Flask modules
@@ -119,7 +121,7 @@ def details():
 @app.route('/calci')
 def calci():
     try:
-        return render_template( 'CutOffCalci.html' )
+        return render_template( 'cutoff_calci.html' )
     except TemplateNotFound:
         return render_template('page-404.html'), 404 
     except:
@@ -217,7 +219,8 @@ def export_excel():
         print("Error:", e)  # Print out any error that occurs for debugging
         return "Error occurred while exporting to Excel"
 
-@app.route('/pie_chart', methods=['POST'])
+@app.route('/stats', methods=['POST'])
+@cross_origin()
 def pie_chart():
     # Get HTML table data from POST request
     html_table = request.form.get('html_table')
@@ -225,20 +228,17 @@ def pie_chart():
     # Convert HTML table to DataFrame
     table_data = pd.read_html(io.StringIO(html_table))[0]
 
-    # Calculate placement percentages for each college
-    placement_percentages = table_data['Placement_Percentage'].astype(float)
+    print('^^')
+    print(table_data)
 
-    # Generate pie chart
-    plt.figure(figsize=(8, 8))
-    plt.pie(placement_percentages, labels=table_data['College_Name'], autopct='%1.1f%%', startangle=140)
-    plt.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-    plt.title('Placement Percentage for Colleges')
-    
-    # Convert plot to base64 encoded image
-    buffer = io.BytesIO()
-    plt.savefig(buffer, format='png')
-    buffer.seek(0)
-    img_str = base64.b64encode(buffer.read()).decode()
-    plt.close()
+    chart_data = [['College Name', 'Placement Percentage']]
+    for index, row in table_data.iterrows():
+        chart_data.append([row['College_Name'], row['Placement_Percentage']])
 
-    return render_template('pie_chart.html', img_str=img_str)
+    # Convert chart data to JSON string
+    chart_data_json = json.dumps(chart_data)
+
+    print('0_0')
+    print(chart_data_json)
+
+    return render_template('statistics.html', chart_data_json=chart_data_json)
