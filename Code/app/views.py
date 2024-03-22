@@ -15,7 +15,6 @@ from jinja2              import TemplateNotFound
 
 import matplotlib.pyplot as plt
 import io
-import base64
 
 # App modules
 from app        import app, lm, bc
@@ -165,7 +164,7 @@ def recommendations():
     print(filtered_data)
 
     # Drop duplicate rows based on College_Name
-    filtered_data.drop_duplicates(subset=['College_Name'], keep='first', inplace=True)
+    filtered_data.drop_duplicates(subset=['College_Name'], keep='last', inplace=True)
 
     # Select only the specified columns
     selected_columns = ['College_Code', 'College_Name', 'Branch_Code', 'Branch_Name', community_column, 'Placement_Percentage']
@@ -228,8 +227,7 @@ def pie_chart():
     # Convert HTML table to DataFrame
     table_data = pd.read_html(io.StringIO(html_table))[0]
 
-    print('^^')
-    print(table_data)
+    # print(table_data)
 
     chart_data = [['College Name', 'Placement Percentage']]
     for index, row in table_data.iterrows():
@@ -238,7 +236,6 @@ def pie_chart():
     # Convert chart data to JSON string
     chart_data_json = json.dumps(chart_data)
 
-    print('0_0')
-    print(chart_data_json)
+    # print(chart_data_json)
 
     return render_template('statistics.html', chart_data_json=chart_data_json)
