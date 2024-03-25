@@ -21,7 +21,11 @@ from app        import app, lm, bc
 from app.models import Users
 from app.forms  import LoginForm, RegisterForm
 
+from app.recommendations import train_content_based_model, recommend_colleges
+
 dataset = pd.read_excel('dataset.xlsx')
+
+content_based_model, label_encoders = train_content_based_model(dataset)
 
 # provide login manager with load_user callback
 @lm.user_loader
@@ -157,14 +161,8 @@ def recommendations():
     elif community == 'ST':
         community_column = 'ST'
 
-    # Filter the dataset based on user inputs
-    filtered_data = dataset[(float(cutoff) >= dataset[community_column]) &
-                           (dataset['Branch_Code'] == branch)]
-    
-    print(filtered_data)
+    recommendations = recommend_colleges(content_based_model, label_encoders, cutoff, branch, location, community, dataset)
 
-    # Drop duplicate rows based on College_Name
-    filtered_data.drop_duplicates(subset=['College_Name'], keep='last', inplace=True)
 
     # Select only the specified columns
     selected_columns = ['College_Code', 'College_Name', 'Branch_Code', 'Branch_Name', community_column, 'Placement_Percentage']
@@ -229,9 +227,9 @@ def pie_chart():
 
     # print(table_data)
 
-    chart_data = [['College Name', 'Placement Percentage']]
+    chart_data = [['College Name', 'Avg_Salary']]
     for index, row in table_data.iterrows():
-        chart_data.append([row['College_Name'], row['Placement_Percentage']])
+        chart_data.append([row['College_Name'], row['Avg_Salary']])
 
     # Convert chart data to JSON string
     chart_data_json = json.dumps(chart_data)
@@ -239,3 +237,23 @@ def pie_chart():
     # print(chart_data_json)
 
     return render_template('statistics.html', chart_data_json=chart_data_json)
+
+
+@app.route('/recommend', methods=['POST'])
+def recommend():
+    cutoff = request.form['cut-off']
+    branch = request.form['branch']
+    community = request.form['community']
+    location = request.form['location']
+    location = location.upper()
+
+    print(cutoff, branch, community, location, sep=" ")
+    recommendations = recommend_colleges(content_based_model, label_encoders, cutoff, branch, location, community, dataset)
+
+    recommendations_df = pd.DataFrame(recommendations)
+    selected_columns = ['College_Name', 'Branch_Name', community, 'Avg_Salary', 'Location', 'College_Website']
+    recommendations_df = recommendations_df[selected_columns]
+    recommendations_df.drop_duplicates(subset=['College_Name'], keep='last', inplace=True)
+
+    table_html = recommendations_df.to_html(index=False, classes='table table-striped')
+    return render_template('recommendations.html', recommendations=recommendations_df, community=community, table_data=table_html)

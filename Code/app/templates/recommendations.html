@@ -42,11 +42,24 @@
             <div class="container bg-white">
                 <div class="row justify-content-center p-4">
                     <h3 style="text-align: center;">Recommendations</h3>
-                    {% if table_data %}
+                    
                     <div class="table-container"></div>
                     <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                {% for column in recommendations.columns %}
+                                <th>{{ column }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
                         <tbody>
-                            {{ table_data | safe }}
+                            {% for index, row in recommendations.iterrows() %}
+                            <tr>
+                                {% for value in row %}
+                                <td>{{ value }}</td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                     <div class="buttons">
@@ -60,9 +73,7 @@
                         </form>
                     </div>
                 </div>
-                {% else %}
-                <p>No recommendations found.</p>
-                {% endif %}
+               
                 <br />
 
                 <a href="/details">Go back to search</a>
