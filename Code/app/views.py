@@ -137,41 +137,22 @@ def sitemap():
 
 @app.route('/recommendations', methods=['POST'])
 def recommendations():
-    # Get user inputs from the form
     cutoff = request.form['cut-off']
     branch = request.form['branch']
     community = request.form['community']
     location = request.form['location']
+    location = location.upper()
 
     print(cutoff, branch, community, location, sep=" ")
-
-    community_column = ''
-    if community == 'OC':
-        community_column = 'OC'
-    elif community == 'BCM':
-        community_column = 'BCM'
-    elif community == 'BC':
-        community_column = 'BC'
-    elif community == 'MBC':
-        community_column = 'MBC'
-    elif community == 'SCA':
-        community_column = 'SCA'
-    elif community == 'SC':
-        community_column = 'SC'
-    elif community == 'ST':
-        community_column = 'ST'
-
     recommendations = recommend_colleges(content_based_model, label_encoders, cutoff, branch, location, community, dataset)
 
+    recommendations_df = pd.DataFrame(recommendations)
+    selected_columns = ['College_Name', 'Branch_Name', community, 'Avg_Salary', 'Location', 'College_Website']
+    recommendations_df = recommendations_df[selected_columns]
+    recommendations_df.drop_duplicates(subset=['College_Name'], keep='last', inplace=True)
 
-    # Select only the specified columns
-    selected_columns = ['College_Code', 'College_Name', 'Branch_Code', 'Branch_Name', community_column, 'Placement_Percentage']
-    filtered_data = filtered_data[selected_columns]
-
-    # Convert filtered data to HTML table
-    table_html = filtered_data.to_html(index=False, classes='table table-striped')
-
-    return render_template('recommendations.html', table_data=table_html, comm=community_column)
+    table_html = recommendations_df.to_html(index=False, classes='table table-striped')
+    return render_template('recommendations.html', recommendations=recommendations_df, community=community, table_data=table_html)
 
 @app.route('/export_excel', methods=['POST'])
 def export_excel():
@@ -237,23 +218,3 @@ def pie_chart():
     # print(chart_data_json)
 
     return render_template('statistics.html', chart_data_json=chart_data_json)
-
-
-@app.route('/recommend', methods=['POST'])
-def recommend():
-    cutoff = request.form['cut-off']
-    branch = request.form['branch']
-    community = request.form['community']
-    location = request.form['location']
-    location = location.upper()
-
-    print(cutoff, branch, community, location, sep=" ")
-    recommendations = recommend_colleges(content_based_model, label_encoders, cutoff, branch, location, community, dataset)
-
-    recommendations_df = pd.DataFrame(recommendations)
-    selected_columns = ['College_Name', 'Branch_Name', community, 'Avg_Salary', 'Location', 'College_Website']
-    recommendations_df = recommendations_df[selected_columns]
-    recommendations_df.drop_duplicates(subset=['College_Name'], keep='last', inplace=True)
-
-    table_html = recommendations_df.to_html(index=False, classes='table table-striped')
-    return render_template('recommendations.html', recommendations=recommendations_df, community=community, table_data=table_html)

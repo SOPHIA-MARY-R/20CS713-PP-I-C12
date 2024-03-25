@@ -32,6 +32,10 @@
         form {
             margin: 5px;
         }
+
+        th, td {
+            width: auto;
+        }
     </style>
 </head>
 
@@ -48,15 +52,19 @@
                         <thead>
                             <tr>
                                 {% for column in recommendations.columns %}
-                                <th>{{ column }}</th>
+                                <th style="width: auto;">{{ column }}</th>
                                 {% endfor %}
                             </tr>
                         </thead>
                         <tbody>
                             {% for index, row in recommendations.iterrows() %}
                             <tr>
-                                {% for value in row %}
+                                {% for column, value in row.items() %}
+                                {% if column == 'College_Website' %}
+                                <td><a href="{{ value }}" target="_blank">{{ value }}</a></td>
+                                {% else %}
                                 <td>{{ value }}</td>
+                                {% endif %}
                                 {% endfor %}
                             </tr>
                             {% endfor %}
